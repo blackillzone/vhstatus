@@ -2,7 +2,24 @@
 # ---- Base Node ----
 FROM alpine:3.12 AS base
 
+ENV USER=npm
+ENV UID=1000
+ENV GID=1000
+
 RUN apk add --no-cache nodejs npm tini
+RUN addgroup \
+    -S "${USER}" \
+    -g "${GID}"
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/usr/src/app" \
+    --ingroup "${USER}" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
+
+USER ${USER}
 
 WORKDIR /usr/src/app
 
