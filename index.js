@@ -10,7 +10,10 @@ app.use(express.static('www'))
 const server = http.createServer(app);
 const wss = new ws.Server({ server });
 
-const config = JSON.parse(fs.readFileSync("config.json", "utf8"));
+const logPath = process.env.VALHEIM_SERVER_LOG_PATH;
+const refreshInterval = process.env.VALHEIM_SERVER_REFRESH_INTERVAL;
+const serverName = process.env.VALHEIM_SERVER_NAME;
+const serverPort = process.env.VALHEIM_SERVER_PORT;
 
 wss.on('connection', socket => {
   socket.on('message', message => console.log(message));
@@ -18,7 +21,7 @@ wss.on('connection', socket => {
 });
 
 function sendUsers() {
-	fs.readFile(config.log, "utf8", (err, data) => {
+	fs.readFile(logPath, "utf8", (err, data) => {
 		if (err) {
 			console.log(err)
 			process.exit(1)
@@ -56,15 +59,15 @@ function sendUsers() {
 			wss.clients.forEach((client) => {
 				let msg = {};
 				msg.users = users;
-				msg.serverName = config.serverName;
+				msg.serverName = serverName;
 				client.send(JSON.stringify(msg));
 			});
 		}
 	});
 }
 
-setInterval(sendUsers, config.freq);
+setInterval(sendUsers, refreshInterval);
 
-server.listen(config.port, () => {
-  console.log(`Valheim status at http://localhost:${config.port}`)
+server.listen(serverPort, () => {
+  console.log(`Valheim status at http://localhost:${serverPort}`)
 })
