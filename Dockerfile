@@ -19,7 +19,7 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 
-USER ${USER}
+USER "${UID}":"${GID}"
 
 WORKDIR /usr/src/app
 
